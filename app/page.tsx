@@ -14,7 +14,7 @@ export default async function Home() {
       {/* HERO */}
       <div className="relative w-full h-[70vh] min-h-[420px] max-h-[640px] overflow-hidden md:rounded-b-3xl">
         <img
-          src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?w=1200"
+          src="https://i.pinimg.com/1200x/a7/cf/b3/a7cfb37382a73d6d8332c4ac26d6e7f7.jpg"
           alt="Chronicle"
           className="w-full h-full object-cover"
         />
@@ -26,13 +26,13 @@ export default async function Home() {
           }}
         />
         <div className="absolute bottom-0 left-0 right-0 px-5 pb-8 md:px-12 md:pb-14 max-w-2xl">
-          <div className="text-neutral-300 text-[10px] md:text-[12px] tracking-[0.15em] font-semibold mb-2.5">
-            2026 ОНЫ ХАВРЫН ЦУГЛУУЛГА
-          </div>
-          <h1 className="text-white font-extrabold text-[38px] md:text-[64px] leading-[0.95] mb-4">
-            ШИНЭ
+          <h1
+            className="text-white uppercase text-[15px] md:text-[19px] leading-[1.35] mb-4 tracking-tight"
+            style={{ fontFamily: 'var(--font-archivo-black)' }}
+          >
+            Life isn&apos;t perfect
             <br />
-            ХЭСЭГ
+            but your outfit can be.
           </h1>
           <Link
             href="/products"

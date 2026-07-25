@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/cart-context'
 
 interface Product {
@@ -13,14 +12,19 @@ interface Product {
   image_url: string
   image_urls: string[]
   stock_status: string
+  size_stock?: Record<string, string>
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-  const router = useRouter()
   const { addItem } = useCart()
   const images = product.image_urls?.length ? product.image_urls : [product.image_url]
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.[0] ?? null)
   const [added, setAdded] = useState(false)
+
+  const currentStatus =
+    selectedSize && product.size_stock?.[selectedSize]
+      ? product.size_stock[selectedSize]
+      : product.stock_status
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -56,7 +60,7 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         )}
 
-        {product.stock_status === 'preorder' ? (
+        {currentStatus === 'preorder' ? (
           <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[9.5px] font-semibold px-2 py-1 rounded-full">
             Захиалгаар
           </div>

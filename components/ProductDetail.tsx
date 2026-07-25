@@ -13,6 +13,7 @@ interface Product {
   image_url: string
   image_urls: string[]
   stock_status: string
+  size_stock?: Record<string, string>
 }
 
 export default function ProductDetail({ product }: { product: Product }) {
@@ -20,8 +21,13 @@ export default function ProductDetail({ product }: { product: Product }) {
   const { addItem } = useCart()
   const images = product.image_urls?.length ? product.image_urls : [product.image_url]
   const [imgIndex, setImgIndex] = useState(0)
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.[0] ?? null)
   const [added, setAdded] = useState(false)
+
+  const currentStatus =
+    selectedSize && product.size_stock?.[selectedSize]
+      ? product.size_stock[selectedSize]
+      : product.stock_status
 
   const handleAdd = () => {
     addItem({
@@ -45,17 +51,17 @@ export default function ProductDetail({ product }: { product: Product }) {
 
   return (
     <div className="max-w-sm md:max-w-3xl mx-auto pb-6 md:grid md:grid-cols-2 md:gap-8 md:pt-8">
-      <button
-        onClick={() => router.back()}
-        className="absolute top-4 left-4 z-10 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center md:relative md:top-0 md:left-0 md:mb-4"
-        aria-label="Буцах"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-      </button>
-
       <div className="relative w-full aspect-[4/5] bg-neutral-800 overflow-hidden md:rounded-2xl md:self-start">
+        <button
+          onClick={() => router.back()}
+          className="absolute top-4 left-4 z-10 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center"
+          aria-label="Буцах"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+
         {images[imgIndex] && (
           <img
             src={images[imgIndex]}
@@ -64,7 +70,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           />
         )}
 
-        {product.stock_status === 'preorder' ? (
+        {currentStatus === 'preorder' ? (
           <div className="absolute top-4 right-4 bg-black/70 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-full">
             Захиалгаар
           </div>

@@ -15,7 +15,6 @@ export default function CartPage() {
   const [customerName, setCustomerName] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'qpay' | 'bank' | ''>('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -30,8 +29,8 @@ export default function CartPage() {
 
   const handleSubmit = async () => {
     setError('')
-    if (!customerName || !phone || !address || !paymentMethod) {
-      setError('Бүх талбарыг бөглөж, төлбөрийн хэлбэрээ сонгоно уу.')
+    if (!customerName || !phone || !address) {
+      setError('Бүх талбарыг бөглөнө үү.')
       return
     }
     setSubmitting(true)
@@ -51,7 +50,7 @@ export default function CartPage() {
       customer_name: customerName,
       phone,
       address,
-      payment_method: paymentMethod,
+      payment_method: 'bank',
       total,
       status: 'pending',
     })
@@ -75,10 +74,9 @@ export default function CartPage() {
         </div>
         <h1 className="text-white font-bold text-[20px] mb-2">Баярлалаа!</h1>
         <p className="text-neutral-400 text-[13px] leading-relaxed mb-6">
-          Таны захиалгыг бүртгэлдээ хадгаллаа.{' '}
-          {paymentMethod === 'qpay'
-            ? 'QPay-р шилжүүлсэн баримтын зургаа Instagram-руу илгээж захиалгаа баталгаажуулна уу.'
-            : 'Дансаар шилжүүлсэн баримтын зургаа Instagram-руу илгээж захиалгаа баталгаажуулна уу.'}
+          Таны захиалгыг бүртгэлдээ хадгаллаа. Дансаар шилжүүлсэн баримтын
+          зургаа @chronicle.mongolia Instagram-руу илгээж захиалгаа
+          баталгаажуулна уу.
         </p>
         <button
           onClick={() => router.push('/profile')}
@@ -192,31 +190,29 @@ export default function CartPage() {
           />
 
           <div className="mt-2">
-            <p className="text-neutral-400 text-[11px] mb-2">Төлбөрийн хэлбэр</p>
-            <button
-              onClick={() => setPaymentMethod('qpay')}
-              className={`w-full text-left rounded-xl p-3 mb-2 border ${
-                paymentMethod === 'qpay'
-                  ? 'border-white bg-neutral-900'
-                  : 'border-neutral-800 bg-neutral-900/50'
-              }`}
-            >
-              <span className="text-white text-[13px] font-semibold">
-                QPay-р шилжүүлэх
-              </span>
-            </button>
-            <button
-              onClick={() => setPaymentMethod('bank')}
-              className={`w-full text-left rounded-xl p-3 border ${
-                paymentMethod === 'bank'
-                  ? 'border-white bg-neutral-900'
-                  : 'border-neutral-800 bg-neutral-900/50'
-              }`}
-            >
-              <span className="text-white text-[13px] font-semibold">
-                Дансаар шилжүүлэх
-              </span>
-            </button>
+            <p className="text-neutral-400 text-[11px] mb-2">Төлбөр төлөх</p>
+            <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-4">
+              <p className="text-white text-[13px] font-bold mb-3">Дансаар шилжүүлэх</p>
+              <div className="text-neutral-300 text-[12px] leading-relaxed space-y-0.5">
+                <p><span className="text-neutral-500">БАНКНЫ НЭР:</span> ХААН БАНК</p>
+                <p><span className="text-neutral-500">ДАНСНЫ ДУГААР:</span> 5435108834</p>
+                <p><span className="text-neutral-500">IBAN ДУГААР:</span> MN120005005435108834</p>
+                <p><span className="text-neutral-500">ДАНСНЫ НЭР:</span> ХҮРЭЛМӨНХ МӨНХ-ОЧИР</p>
+                <p className="mt-2">
+                  <span className="text-neutral-500">ГҮЙЛГЭЭНИЙ УТГА:</span> Өөрийн утасны дугаар болон Instagram хаягаа бичнэ үү.
+                </p>
+              </div>
+              <div className="border-t border-neutral-800 mt-3 pt-3">
+                <p className="text-neutral-300 text-[12px] leading-relaxed">
+                  Төлбөр шилжүүлсний дараа{' '}
+                  <span className="text-white font-semibold">@chronicle.mongolia</span>{' '}
+                  гэсэн Instagram хаягруу гүйлгээний screenshot илгээж захиалга баталгаажсан эсэхийг шалгана уу!
+                </p>
+                <p className="text-neutral-500 text-[11px] mt-2 italic">
+                  Зөвхөн төлбөр төлөгдсөн захиалга баталгаажих болохыг анхаарна уу!
+                </p>
+              </div>
+            </div>
           </div>
 
           {error && <p className="text-red-400 text-[12px]">{error}</p>}

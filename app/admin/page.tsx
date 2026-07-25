@@ -13,6 +13,7 @@ interface Product {
   image_url: string
   image_urls: string[]
   stock_status: string
+  size_stock: Record<string, string>
   is_featured: boolean
 }
 
@@ -28,7 +29,7 @@ export default function AdminPage() {
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
-  const [stockStatus, setStockStatus] = useState<'in_stock' | 'preorder'>('in_stock')
+  const [sizeStock, setSizeStock] = useState<Record<string, 'in_stock' | 'preorder'>>({})
   const [isFeatured, setIsFeatured] = useState(false)
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -69,9 +70,24 @@ export default function AdminPage() {
   }
 
   const toggleSize = (size: string) => {
-    setSelectedSizes((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
-    )
+    if (selectedSizes.includes(size)) {
+      setSelectedSizes((prev) => prev.filter((s) => s !== size))
+      setSizeStock((prev) => {
+        const next = { ...prev }
+        delete next[size]
+        return next
+      })
+    } else {
+      setSelectedSizes((prev) => [...prev, size])
+      setSizeStock((prev) => ({ ...prev, [size]: 'in_stock' }))
+    }
+  }
+
+  const toggleSizeStatus = (size: string) => {
+    setSizeStock((prev) => ({
+      ...prev,
+      [size]: prev[size] === 'in_stock' ? 'preorder' : 'in_stock',
+    }))
   }
 
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +134,9 @@ export default function AdminPage() {
       uploadedUrls.push(urlData.publicUrl)
     }
 
+    const allInStock =
+      selectedSizes.length > 0 && selectedSizes.every((s) => sizeStock[s] === 'in_stock')
+
     const { error: insertError } = await supabase.from('products').insert({
       name,
       price: Number(price),
@@ -125,7 +144,8 @@ export default function AdminPage() {
       description,
       image_url: uploadedUrls[0],
       image_urls: uploadedUrls,
-      stock_status: stockStatus,
+      stock_status: selectedSizes.length === 0 ? 'in_stock' : allInStock ? 'in_stock' : 'preorder',
+      size_stock: sizeStock,
       is_featured: isFeatured,
     })
 
@@ -139,7 +159,7 @@ export default function AdminPage() {
     setPrice('')
     setDescription('')
     setSelectedSizes([])
-    setStockStatus('in_stock')
+    setSizeStock({})
     setIsFeatured(false)
     setImageFiles([])
     setImagePreviews([])
@@ -220,8 +240,10 @@ export default function AdminPage() {
         />
 
         <div>
-          <p className="text-neutral-400 text-[11px] mb-2">Хэмжээ</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-neutral-400 text-[11px] mb-2">
+            Хэмжээ сонгоод, тус бүрийн төлөвийг тохируулна уу
+          </p>
+          <div className="flex flex-wrap gap-2 mb-3">
             {SIZE_OPTIONS.map((size) => (
               <button
                 key={size}
@@ -237,34 +259,30 @@ export default function AdminPage() {
               </button>
             ))}
           </div>
-        </div>
 
-        <div>
-          <p className="text-neutral-400 text-[11px] mb-2">Барааны төлөв</p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setStockStatus('in_stock')}
-              className={`flex-1 rounded-xl py-2.5 text-[12px] font-semibold ${
-                stockStatus === 'in_stock'
-                  ? 'bg-white text-black'
-                  : 'bg-neutral-900 text-neutral-400 border border-neutral-700'
-              }`}
-            >
-              Бэлэн байгаа
-            </button>
-            <button
-              type="button"
-              onClick={() => setStockStatus('preorder')}
-              className={`flex-1 rounded-xl py-2.5 text-[12px] font-semibold ${
-                stockStatus === 'preorder'
-                  ? 'bg-white text-black'
-                  : 'bg-neutral-900 text-neutral-400 border border-neutral-700'
-              }`}
-            >
-              Захиалгаар
-            </button>
-          </div>
+          {selectedSizes.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              {selectedSizes.map((size) => (
+                <div
+                  key={size}
+                  className="flex items-center justify-between bg-neutral-900 rounded-xl px-3 py-2"
+                >
+                  <span className="text-white text-[12px] font-semibold w-10">{size}</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleSizeStatus(size)}
+                    className={`text-[10.5px] font-semibold px-3 py-1.5 rounded-full ${
+                      sizeStock[size] === 'in_stock'
+                        ? 'bg-white text-black'
+                        : 'bg-neutral-800 text-neutral-300'
+                    }`}
+                  >
+                    {sizeStock[size] === 'in_stock' ? 'Бэлэн байгаа' : 'Захиалгаар'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <label className="flex items-center gap-2.5 bg-neutral-900 rounded-xl px-4 py-3 cursor-pointer">
